@@ -1,10 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import { PlatformPressable } from "@react-navigation/elements";
 import { style } from "./styles";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { Audio } from "expo-av";
-
 export default function CustomTabBar({ state, descriptors, navigation }) {
   const [audioSelect, setAudioSelect] = useState(null);
 
@@ -17,11 +16,12 @@ export default function CustomTabBar({ state, descriptors, navigation }) {
     const { sound } = await Audio.Sound.createAsync(
       require("../../assets/select.mp3")
     );
-
     setAudioSelect(sound);
   }
 
-  loadSound();
+  useEffect(() => {
+    loadSound();
+  }, []);
 
   return (
     <View style={style.tabGroup}>

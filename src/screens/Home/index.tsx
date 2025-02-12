@@ -1,42 +1,46 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Text, View, TouchableOpacity } from "react-native";
 import { style } from "./styles";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import LottieView from 'lottie-react-native'
-import bulbassaurAnimation from '../../assets/bulbassaurAnimation.json'
+import LottieView from "lottie-react-native";
+import bulbassaurAnimation from "../../assets/bulbassaurAnimation.json";
 import { Audio } from "expo-av";
-
 
 export default function Home() {
   const navigation = useNavigation<NavigationProp<any>>();
 
   const [audioSelect, setAudioSelect] = useState(null);
 
-  async function loadSound() {
-      const { sound } = await Audio.Sound.createAsync(
-        require("../../assets/select.mp3")
-      );
-  
-      setAudioSelect(sound);
+  useEffect(() => {
+    async function loadSound() {
+      try {
+        const { sound } = await Audio.Sound.createAsync(
+          require("../../assets/select.mp3")
+        );
+        setAudioSelect(sound);
+      } catch (error) {
+        console.error("Erro ao carregar o áudio:", error);
+      }
     }
-  
-    loadSound();
 
-   async function redirect() {
+    loadSound();
+  }, []);
+
+  async function redirect() {
     await audioSelect.replayAsync();
-    
+
     navigation.navigate("TabRoutes");
   }
 
   return (
     <View style={style.container}>
-        <LottieView
-          style={style.animation}
-          source={bulbassaurAnimation}
-          autoPlay
-          loop
-        />
+      <LottieView
+        style={style.animation}
+        source={bulbassaurAnimation}
+        autoPlay
+        loop
+      />
 
       <View style={style.titleWrapper}>
         <Text style={style.title}>Deco Pokedéx</Text>
