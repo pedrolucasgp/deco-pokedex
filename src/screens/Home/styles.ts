@@ -22,6 +22,7 @@ export const style = StyleSheet.create({
     searchBar:{
         width:'100%',
         flexDirection: 'row',
+        alignItems: 'center',
         borderRadius: 10,
         borderColor: 'gray',
         borderWidth: 1,
@@ -33,8 +34,8 @@ export const style = StyleSheet.create({
         flexDirection: 'row',
         flexWrap: 'wrap',
         justifyContent: 'space-between',
-        borderWidth: 1,
-        borderColor: 'blue'
+        width: '50%',
+        padding: 10
     },
     cardContent:{
         backgroundColor: '#d6ddde',
