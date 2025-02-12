@@ -1,10 +1,11 @@
 import { StyleSheet } from "react-native";
 
 export const style = StyleSheet.create({
-    container:{
+     container:{
+        alignItems: 'center',
+        justifyContent: 'center',
         gap: 30,
         padding: 20,
-        paddingTop: 50,
         width:'100%',
         height: '100%',
         backgroundColor: '#fffafa'
@@ -12,49 +13,32 @@ export const style = StyleSheet.create({
     titleWrapper:{
         flexDirection: 'row',
         alignItems: 'center',
-        textAlign: 'left',
-        width: '100%'
+        justifyContent: 'center'
     },
     title:{
         fontSize: 30,
         fontWeight: 'bold'
     },
-    searchBar:{
-        width:'100%',
-        flexDirection: 'row',
+    text:{
+        textAlign: 'center',
+        fontSize: 20
+    },
+    button:{
         alignItems: 'center',
+        justifyContent: 'center',
+        width: '90%',
+        height: 50,
+        backgroundColor: '#ff474c',
         borderRadius: 10,
-        borderColor: 'gray',
-        borderWidth: 1,
-        padding: 10,
-        gap: 5,
-        marginBottom: 20
+        marginTop: 200
     },
-    card:{
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        justifyContent: 'space-between',
-        width: '50%',
-        padding: 10
-    },
-    cardContent:{
-        backgroundColor: '#d6ddde',
-        borderRadius: 10,
-        borderWidth: 0.5,
-        flex: 1,
-        alignItems: 'center',
-        padding: 15
-    },
-    pokemonNumber:{
-        fontSize: 15,
-        marginRight: '70%'
-    },
-    pokemonName:{
+    buttonText:{
+        color: 'white',
         fontSize: 20,
         fontWeight: 'bold'
     },
-    image:{
-        width: 150,
-        height: 150
+    animation:{
+        width: 300,
+        height: 200,
     }
 })

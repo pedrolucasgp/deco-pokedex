@@ -1,59 +1,45 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
+import { Text, View, TouchableOpacity } from "react-native";
 import { style } from "./styles";
-import { FlatList, Image, Text, TextInput, View } from "react-native";
+import { useNavigation, NavigationProp } from "@react-navigation/native";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { fetchPokemons } from "../../services/api";
-import { Pokemon } from "../../@types/pokemon";
+import LottieView from 'lottie-react-native'
+import bulbassaurAnimation from '../../assets/bulbassaurAnimation.json'
+import { Audio } from "expo-av";
+
 
 export default function Home() {
-  const [pokemons, setPokemons] = useState<Pokemon[]>([]);
+  const navigation = useNavigation<NavigationProp<any>>();
 
-  const [searchValue, setSearchValue] = useState("");
-  const [list, setList] = useState(pokemons);
+  const [audioSelect, setAudioSelect] = useState(null);
 
-  useEffect(() => {
-    const loadPokemons = async () => {
-      const data = await fetchPokemons();
-
-      const fetchPokemonsData: Pokemon[] = await Promise.all(
-        data.map(async (item: { name: string; url: string }) => {
-          const response = await fetch(item.url);
-          const details = await response.json();
-
-          return {
-            id: details.id,
-            name: item.name,
-            image: details.sprites.front_default,
-            type: details.types.type,
-          };
-        })
+  async function loadSound() {
+      const { sound } = await Audio.Sound.createAsync(
+        require("../../assets/select.mp3")
       );
-
-      setPokemons(fetchPokemonsData);
-      setList(fetchPokemonsData);
-    };
-
-    loadPokemons();
-  }, []);
-
-  useEffect(() => {
-    if (!searchValue) {
-      setList(pokemons);
-    } else {
-      setList(
-        pokemons.filter(
-          (item) =>
-            item.name.toLowerCase().indexOf(searchValue.toLowerCase()) > -1 ||
-            item.id == searchValue
-        )
-      );
+  
+      setAudioSelect(sound);
     }
-  }, [searchValue]);
+  
+    loadSound();
+
+   async function redirect() {
+    await audioSelect.replayAsync();
+    
+    navigation.navigate("TabRoutes");
+  }
 
   return (
     <View style={style.container}>
+        <LottieView
+          style={style.animation}
+          source={bulbassaurAnimation}
+          autoPlay
+          loop
+        />
+
       <View style={style.titleWrapper}>
-        <Text style={style.title}>Deco Pokédex</Text>
+        <Text style={style.title}>Deco Pokedéx</Text>
         <MaterialCommunityIcons
           style={{ marginLeft: 10 }}
           name="pokeball"
@@ -61,34 +47,13 @@ export default function Home() {
           color="red"
         />
       </View>
+      <Text style={style.text}>
+        Explore todos os Pokémons e comece sua jornada!
+      </Text>
 
-      <View style={style.searchBar}>
-        <MaterialCommunityIcons name="text-search" size={24} color="gray" />
-        <TextInput
-          placeholder="Search a Pokémon by name or dex number..."
-          value={searchValue}
-          onChangeText={setSearchValue}
-          style={{ flex: 1 }}
-        />
-      </View>
-
-      <FlatList
-        numColumns={2}
-        data={list}
-        keyExtractor={(item) => item.name}
-        renderItem={({ item }) => (
-          <View style={style.card}>
-            <View style={style.cardContent}>
-              <Text style={style.pokemonNumber}>#{item.id}</Text>
-              <Image source={{ uri: item.image }} style={style.image} />
-              <Text style={style.pokemonName}>
-                {item.name.charAt(0).toUpperCase() + item.name.slice(1)}
-              </Text>
-              {/* <Text style={style.pokemonNumber}>{item.type}</Text> */}
-            </View>
-          </View>
-        )}
-      />
+      <TouchableOpacity style={style.button} onPress={() => redirect()}>
+        <Text style={style.buttonText}>Começar</Text>
+      </TouchableOpacity>
     </View>
   );
 }
