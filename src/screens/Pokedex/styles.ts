@@ -22,7 +22,6 @@ export const style = StyleSheet.create({
     },
     card:{
         flexDirection: 'row',
-        flexWrap: 'wrap',
         justifyContent: 'space-between',
         width: '50%',
         padding: 10
@@ -46,5 +45,18 @@ export const style = StyleSheet.create({
     image:{
         width: 150,
         height: 150
+    },
+    loadingWrapper:{
+        marginTop: '50%',
+        alignItems: 'center',
+        gap: 90
+    },
+    animation:{
+        width: 200,
+        height: 200,
+    },
+    loadingText:{
+        fontSize: 20,
+        fontWeight: 'bold'
     }
 })

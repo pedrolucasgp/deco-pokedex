@@ -4,6 +4,8 @@ import { FlatList, Image, Text, TextInput, View } from "react-native";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { fetchPokemons } from "../../services/api";
 import { Pokemon } from "../../@types/pokemon";
+import pokeballLoading from "../../assets/pokeballLoading.json";
+import LottieView from "lottie-react-native";
 
 export default function Pokedex() {
   const [pokemons, setPokemons] = useState<Pokemon[]>([]);
@@ -24,7 +26,7 @@ export default function Pokedex() {
             id: details.id,
             name: item.name,
             image: details.sprites.other["official-artwork"].front_default,
-            type: details.types.type,
+            types: details.types.map((t: { type: { name: string } }) => t.type.name)
           };
         })
       );
@@ -62,6 +64,18 @@ export default function Pokedex() {
         />
       </View>
 
+      {list.length == 0 && (
+        <View style={style.loadingWrapper}>
+          <LottieView
+            style={style.animation}
+            source={pokeballLoading}
+            autoPlay
+            loop
+          />
+          <Text style={style.loadingText}>Carregando...</Text>
+        </View>
+      )}
+
       <FlatList
         numColumns={2}
         data={list}
@@ -74,7 +88,10 @@ export default function Pokedex() {
               <Text style={style.pokemonName}>
                 {item.name.charAt(0).toUpperCase() + item.name.slice(1)}
               </Text>
-              {/* <Text style={style.pokemonNumber}>{item.type}</Text> */}
+             
+                {/* <Text style={style.pokemonNumber}>{item.types[0]}</Text>
+                {item.types[1] && <Text style={style.pokemonNumber}>{item.types[1]}</Text>} */}
+              
             </View>
           </View>
         )}

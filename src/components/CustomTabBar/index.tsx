@@ -54,7 +54,7 @@ export default function CustomTabBar({ state, descriptors, navigation }) {
             <MaterialIcons
               name={icons[route.name]}
               size={30}
-              color={isFocused ? "#9597F4" : "gray"}
+              color={isFocused ? "red" : "gray"}
             />
           </PlatformPressable>
         );
