@@ -7,7 +7,7 @@ const Stack = createStackNavigator();
 export default function Routes() {
   return (
     <Stack.Navigator
-    //   id={undefined}
+      id={undefined}
       screenOptions={{
         headerShown: false,
         gestureEnabled: false,

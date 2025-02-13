@@ -39,6 +39,6 @@ export const style = StyleSheet.create({
     },
     animation:{
         width: 300,
-        height: 200,
+        height: 300,
     }
 })

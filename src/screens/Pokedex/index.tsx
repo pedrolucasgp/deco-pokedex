@@ -23,7 +23,7 @@ export default function Pokedex() {
           return {
             id: details.id,
             name: item.name,
-            image: details.sprites.other['official-artwork'].front_default,
+            image: details.sprites.other["official-artwork"].front_default,
             type: details.types.type,
           };
         })
@@ -52,7 +52,6 @@ export default function Pokedex() {
 
   return (
     <View style={style.container}>
-
       <View style={style.searchBar}>
         <MaterialCommunityIcons name="text-search" size={24} color="gray" />
         <TextInput

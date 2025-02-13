@@ -4,6 +4,7 @@ import { PlatformPressable } from "@react-navigation/elements";
 import { style } from "./styles";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { Audio } from "expo-av";
+
 export default function CustomTabBar({ state, descriptors, navigation }) {
   const [audioSelect, setAudioSelect] = useState(null);
 

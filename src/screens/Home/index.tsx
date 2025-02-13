@@ -4,7 +4,7 @@ import { style } from "./styles";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import LottieView from "lottie-react-native";
-import bulbassaurAnimation from "../../assets/bulbassaurAnimation.json";
+import pikachuAnimation from "../../assets/pikachuAnimation.json";
 import { Audio } from "expo-av";
 
 export default function Home() {
@@ -12,18 +12,14 @@ export default function Home() {
 
   const [audioSelect, setAudioSelect] = useState(null);
 
-  useEffect(() => {
-    async function loadSound() {
-      try {
-        const { sound } = await Audio.Sound.createAsync(
-          require("../../assets/select.mp3")
-        );
-        setAudioSelect(sound);
-      } catch (error) {
-        console.error("Erro ao carregar o áudio:", error);
-      }
-    }
+  async function loadSound() {
+    const { sound } = await Audio.Sound.createAsync(
+      require("../../assets/select.mp3")
+    );
+    setAudioSelect(sound);
+  }
 
+  useEffect(() => {
     loadSound();
   }, []);
 
@@ -37,7 +33,7 @@ export default function Home() {
     <View style={style.container}>
       <LottieView
         style={style.animation}
-        source={bulbassaurAnimation}
+        source={pikachuAnimation}
         autoPlay
         loop
       />

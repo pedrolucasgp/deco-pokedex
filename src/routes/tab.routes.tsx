@@ -1,4 +1,3 @@
-
 import CustomTabBar from "../components/CustomTabBar";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Pokedex from "../screens/Pokedex";
@@ -9,7 +8,7 @@ const Tab = createBottomTabNavigator();
 export default function TabRoutes() {
   return (
     <Tab.Navigator
-    // id={undefined}
+      id={undefined}
       initialRouteName="Pokedex"
       screenOptions={{ headerShown: false }}
       tabBar={(props) => <CustomTabBar {...props} />}
