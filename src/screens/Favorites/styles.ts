@@ -5,7 +5,7 @@ export const style = StyleSheet.create({
     container:{
         alignItems: 'center',
         flexDirection: 'column',
-        justifyContent: 'space-around',
+        justifyContent: 'center',
         padding: 30,
         width:'100%',
         height: '100%',
@@ -14,6 +14,19 @@ export const style = StyleSheet.create({
     title:{
         fontSize: 20,
         fontWeight: 'bold',
-        color: '#595bb3'
+        color: 'red'
+    },
+    loadingWrapper:{
+        marginTop: '20%',
+        alignItems: 'center',
+        gap: 90
+    },
+    animation:{
+        width: 200,
+        height: 200,
+    },
+    loadingText:{
+        fontSize: 20,
+        fontWeight: 'bold'
     }
 })

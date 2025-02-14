@@ -1,18 +1,22 @@
 import React from "react";
 import { Text, View } from "react-native";
 import { style } from "./styles";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import pokeballLoading from "../../assets/pokeballLoading.json";
+import LottieView from "lottie-react-native";
 
 export default function Favorites() {
   return (
     <View style={style.container}>
       <Text style={style.title}>Fav Screen</Text>
-      <MaterialCommunityIcons
-        style={{}}
-        name="pokeball"
-        size={100}
-        color="red"
-      />
+      <View style={style.loadingWrapper}>
+        <LottieView
+          style={style.animation}
+          source={pokeballLoading}
+          autoPlay
+          loop
+        />
+        <Text style={style.loadingText}>Desenvolvendo...</Text>
+      </View>
     </View>
   );
 }

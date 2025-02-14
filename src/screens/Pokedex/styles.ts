@@ -27,7 +27,6 @@ export const style = StyleSheet.create({
         padding: 10
     },
     cardContent:{
-        backgroundColor: '#d6ddde',
         borderRadius: 10,
         borderWidth: 0.5,
         flex: 1,

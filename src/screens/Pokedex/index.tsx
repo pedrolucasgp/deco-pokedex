@@ -3,7 +3,7 @@ import { style } from "./styles";
 import { FlatList, Image, Text, TextInput, View } from "react-native";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { fetchPokemons } from "../../services/api";
-import { Pokemon } from "../../@types/pokemon";
+import { Pokemon, getTypeColor } from "../../@types/pokemon";
 import pokeballLoading from "../../assets/pokeballLoading.json";
 import LottieView from "lottie-react-native";
 
@@ -26,7 +26,9 @@ export default function Pokedex() {
             id: details.id,
             name: item.name,
             image: details.sprites.other["official-artwork"].front_default,
-            types: details.types.map((t: { type: { name: string } }) => t.type.name)
+            types: details.types.map(
+              (t: { type: { name: string } }) => t.type.name
+            ),
           };
         })
       );
@@ -57,7 +59,7 @@ export default function Pokedex() {
       <View style={style.searchBar}>
         <MaterialCommunityIcons name="text-search" size={24} color="gray" />
         <TextInput
-          placeholder="Search a Pokémon by name or dex number..."
+          placeholder="Busque um Pokémon. Ex. Mew ou 151..."
           value={searchValue}
           onChangeText={setSearchValue}
           style={{ flex: 1 }}
@@ -82,16 +84,20 @@ export default function Pokedex() {
         keyExtractor={(item) => item.name}
         renderItem={({ item }) => (
           <View style={style.card}>
-            <View style={style.cardContent}>
+            <View
+              style={[
+                style.cardContent,
+                { backgroundColor: getTypeColor(item.types[0]) },
+              ]}
+            >
               <Text style={style.pokemonNumber}>#{item.id}</Text>
               <Image source={{ uri: item.image }} style={style.image} />
               <Text style={style.pokemonName}>
                 {item.name.charAt(0).toUpperCase() + item.name.slice(1)}
               </Text>
-             
-                {/* <Text style={style.pokemonNumber}>{item.types[0]}</Text>
+
+              {/* <Text style={style.pokemonNumber}>{item.types[0]}</Text>
                 {item.types[1] && <Text style={style.pokemonNumber}>{item.types[1]}</Text>} */}
-              
             </View>
           </View>
         )}
