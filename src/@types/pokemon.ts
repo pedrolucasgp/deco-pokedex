@@ -1,9 +1,15 @@
+export interface Evolution{
+  name: string;
+  image: string;
+}
 export interface Pokemon {
   id: string;
   name: string;
   url: string;
   image: string;
   types: string[];
+  species: string;
+  evolutionLine: Evolution[];
 }
 
 export const typesColors = {
