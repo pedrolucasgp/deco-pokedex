@@ -59,6 +59,9 @@ export default function Pokedex() {
                 image:
                   pokemonDetails.sprites.other["official-artwork"]
                     .front_default,
+                types: pokemonDetails.types.map(
+                  (t: { type: { name: string } }) => t.type.name
+                ),
               });
               current = current.evolves_to[0] || null;
             }
@@ -131,7 +134,6 @@ export default function Pokedex() {
       <View>
         <Modal animationType="slide" transparent={true} visible={visible}>
           <View style={style.modalWrapper}>
-            ...
             <View style={style.modalView}>
               <View style={style.modalButtonWrapper}>
                 <TouchableOpacity
@@ -205,30 +207,35 @@ export default function Pokedex() {
                   {selectedPokemon?.species}
                 </Text>
               </View>
-              <View>
-                <Text style={style.pokemonDetailsTitle}>Linha de Evolução</Text>
-                {selectedPokemon?.evolutionLine && selectedPokemon.evolutionLine.length > 0 ? (
-                  <View style={style.evolutionContainer}>
-                    {selectedPokemon.evolutionLine.map((evolution, index) => (
-                      <View key={index} style={[
+              <Text style={style.pokemonDetailsTitle}>Linha de Evolução</Text>
+              {selectedPokemon?.evolutionLine && (
+                <View style={style.evolutionContainer}>
+                  {selectedPokemon.evolutionLine.map((evolution, index) => (
+                    <View
+                      key={index}
+                      style={[
                         style.evolutionCard,
-                        {  backgroundColor: getTypeColor(selectedPokemon?.types[0]) },
-                      ]}>
-                        {evolution.image && (
-                          <Image source={{ uri: evolution.image }} style={style.evolutionImage} />
-                        )}
-                        {evolution.name && (
-                          <Text style={style.evolutionText}>
-                            {evolution.name.charAt(0).toUpperCase() + evolution.name.slice(1)}
-                          </Text>
-                        )}
-                      </View>
-                    ))}
-                  </View>
-                ) : (
-                  <Text style={style.pokemonDetailsText}>Este Pokémon não possui evoluções.</Text>
-                )}
-              </View>
+                        {
+                          backgroundColor: getTypeColor(evolution.types[0]),
+                        },
+                      ]}
+                    >
+                      {evolution.image && (
+                        <Image
+                          source={{ uri: evolution.image }}
+                          style={style.evolutionImage}
+                        />
+                      )}
+                      {evolution.name && (
+                        <Text style={style.evolutionText}>
+                          {evolution.name.charAt(0).toUpperCase() +
+                            evolution.name.slice(1)}
+                        </Text>
+                      )}
+                    </View>
+                  ))}
+                </View>
+              )}
             </View>
           </View>
         </Modal>

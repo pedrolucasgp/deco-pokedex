@@ -139,7 +139,7 @@ export const style = StyleSheet.create({
     evolutionContainer: {
         flexDirection: "row",
         justifyContent: "center",
-        flexWrap: "wrap",
+        flexWrap: "nowrap",
         marginTop: 10,
         marginBottom: 10
       },
@@ -163,4 +163,5 @@ export const style = StyleSheet.create({
         fontSize: 14,
         fontWeight: "bold",
       },
+      
 })

@@ -1,6 +1,7 @@
 export interface Evolution{
   name: string;
   image: string;
+  types: string[];
 }
 export interface Pokemon {
   id: string;
