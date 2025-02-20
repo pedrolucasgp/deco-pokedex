@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { style } from "./styles";
 import {
+  Alert,
   FlatList,
   Image,
   Modal,
@@ -15,9 +16,11 @@ import { Pokemon, getTypeColor } from "../../@types/pokemon";
 import pokeballLoading from "../../assets/pokeballLoading.json";
 import LottieView from "lottie-react-native";
 import { BlurView } from "expo-blur";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Pokedex() {
   const [pokemons, setPokemons] = useState<Pokemon[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const [searchValue, setSearchValue] = useState("");
   const [list, setList] = useState(pokemons);
@@ -25,6 +28,43 @@ export default function Pokedex() {
   const [visible, setVisible] = useState(false);
 
   const [selectedPokemon, setSelectedPokemon] = useState<Pokemon | null>(null);
+
+  const handleFavorite = async () => {
+    const existingFavs = await getFavsFromStorage();
+
+    const alreadyExists = existingFavs.some(
+      (fav) => fav.id == selectedPokemon.id
+    );
+
+    if (alreadyExists == false) {
+      const updatedFavs = [...existingFavs, selectedPokemon];
+
+      await sendFavsToStorage(updatedFavs);
+
+      Alert.alert(
+        selectedPokemon?.name.charAt(0).toUpperCase() +
+          selectedPokemon?.name.slice(1) +
+          " adicionado aos favoritos."
+      );
+
+      return;
+    }
+
+    Alert.alert(
+      selectedPokemon?.name.charAt(0).toUpperCase() +
+        selectedPokemon?.name.slice(1) +
+        " já é um de seus favoritos."
+    );
+  };
+  
+  const sendFavsToStorage = async (favPokemons: Pokemon[]) => {
+    await AsyncStorage.setItem("favPokemons", JSON.stringify(favPokemons));
+  };
+
+  const getFavsFromStorage = async () => {
+    const result = await AsyncStorage.getItem("favPokemons");
+    return result ? JSON.parse(result) : [];
+  };
 
   useEffect(() => {
     const loadPokemons = async () => {
@@ -87,6 +127,7 @@ export default function Pokedex() {
 
       setPokemons(fetchPokemonsData);
       setList(fetchPokemonsData);
+      setLoading(false);
     };
 
     loadPokemons();
@@ -108,6 +149,9 @@ export default function Pokedex() {
 
   return (
     <View style={style.container}>
+
+      
+
       {visible && <BlurView style={style.blur} />}
       <View style={style.searchBar}>
         <MaterialCommunityIcons name="text-search" size={24} color="gray" />
@@ -119,7 +163,7 @@ export default function Pokedex() {
         />
       </View>
 
-      {list.length == 0 && (
+      {loading && (
         <View style={style.loadingWrapper}>
           <LottieView
             style={style.animation}
@@ -149,7 +193,7 @@ export default function Pokedex() {
 
                 <TouchableOpacity
                   style={style.modalButton}
-                  onPress={() => setVisible(!visible)}
+                  onPress={handleFavorite}
                 >
                   <MaterialCommunityIcons name="heart" size={24} color="gray" />
                 </TouchableOpacity>
@@ -210,7 +254,30 @@ export default function Pokedex() {
               <Text style={style.pokemonDetailsTitle}>Linha de Evolução</Text>
               {selectedPokemon?.evolutionLine && (
                 <View style={style.evolutionContainer}>
-                  {selectedPokemon.evolutionLine.map((evolution, index) => (
+                  <FlatList
+                    scrollEnabled={false}
+                    numColumns={3}
+                    data={selectedPokemon.evolutionLine}
+                    keyExtractor={(evo) => evo.name}
+                    renderItem={({ item }) => (
+                      <View
+                        style={[
+                          style.evolutionCard,
+                          { backgroundColor: getTypeColor(item.types[0]) },
+                        ]}
+                      >
+                        <Image
+                          source={{ uri: item.image }}
+                          style={style.evolutionImage}
+                        />
+                        <Text style={style.evolutionText}>
+                          {item.name.charAt(0).toUpperCase() +
+                            item.name.slice(1)}
+                        </Text>
+                      </View>
+                    )}
+                  />
+                  {/* {selectedPokemon.evolutionLine.map((evolution, index) => (
                     <View
                       key={index}
                       style={[
@@ -233,7 +300,7 @@ export default function Pokedex() {
                         </Text>
                       )}
                     </View>
-                  ))}
+                  ))} */}
                 </View>
               )}
             </View>
