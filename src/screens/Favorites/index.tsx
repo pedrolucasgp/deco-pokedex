@@ -45,10 +45,10 @@ export default function Favorites() {
 
   const saveFavListOnStorage = async (favPokemons: Pokemon[]) => {
     await AsyncStorage.setItem("favPokemons", JSON.stringify(favPokemons));
-  }
+  };
 
   async function clearFavs() {
-    if (favPokemons == null) {
+    if (favPokemons == null || favPokemons.length == 0) {
       Alert.alert("Você não tem nenhum Pokémon favorito.");
       return;
     }
@@ -66,28 +66,28 @@ export default function Favorites() {
     setAudioSelect(sound);
   }
 
-  async function handleDelete(){
-    if(!selectedPokemon) return;
+  async function handleDelete() {
+    if (!selectedPokemon) return;
 
-    const newFavList = favPokemons.filter((favPokemon) => favPokemon.id != selectedPokemon.id);
+    const newFavList = favPokemons.filter(
+      (favPokemon) => favPokemon.id != selectedPokemon.id
+    );
     setFavPokemons(newFavList);
     saveFavListOnStorage(newFavList);
     await audioSelect.replayAsync();
-    setVisibleDelete(false)
+    setVisibleDelete(false);
   }
 
   const renderRightActions = (item: Pokemon) => (
     <View style={style.deleteButton}>
-        <TouchableOpacity
-          onPress={() => {
-            setSelectedPokemon(item);
-            setVisibleDelete(true);
-          }
-          }
-        >
-          <MaterialCommunityIcons name="trash-can" size={30} color="white" />
-        </TouchableOpacity>
-
+      <TouchableOpacity
+        onPress={() => {
+          setSelectedPokemon(item);
+          setVisibleDelete(true);
+        }}
+      >
+        <MaterialCommunityIcons name="trash-can" size={30} color="white" />
+      </TouchableOpacity>
     </View>
   );
 
@@ -127,23 +127,28 @@ export default function Favorites() {
         </View>
       )}
 
-      {favPokemons.length == 0 && (
-        <View style={style.loadingWrapper}>
-          <LottieView
-            style={style.animation}
-            source={psyduckAnimation}
-            autoPlay
-            loop
-          />
-          <Text style={style.loadingText}>
-            Você não tem nenhum Pokémon adicionado como favorito!
-          </Text>
-        </View>
-      )}
+      {favPokemons.length == 0 ||
+        (favPokemons == null && (
+          <View style={style.loadingWrapper}>
+            <LottieView
+              style={style.animation}
+              source={psyduckAnimation}
+              autoPlay
+              loop
+            />
+            <Text style={style.loadingText}>
+              Você não tem nenhum Pokémon adicionado como favorito!
+            </Text>
+          </View>
+        ))}
 
       <View>
         {/* Modal do clear ALL */}
-        <Modal animationType="fade" transparent={true} visible={visibleClearAll}>
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={visibleClearAll}
+        >
           <View style={style.centeredModal}>
             <View style={style.modalView}>
               <Text style={style.modalTitle}>
@@ -180,14 +185,20 @@ export default function Favorites() {
             <View style={style.modalView}>
               <Text style={style.modalTitle}>
                 {" "}
-                Deseja remover {selectedPokemon.name.charAt(0).toUpperCase() + selectedPokemon.name.slice(1)}?{" "}
+                Deseja remover{" "}
+                {selectedPokemon?.name.charAt(0).toUpperCase() +
+                  selectedPokemon?.name.slice(1)}
+                ?{" "}
               </Text>
               <Text style={style.modalText}>
                 {" "}
                 Isso não poderá ser desfeito. Confirma?{" "}
               </Text>
               <View style={style.modalButtonGroup}>
-                <TouchableOpacity style={style.modalButton} onPress={handleDelete}>
+                <TouchableOpacity
+                  style={style.modalButton}
+                  onPress={handleDelete}
+                >
                   <Text style={{ color: "#9597F4", fontWeight: "bold" }}>
                     Sim
                   </Text>
@@ -205,7 +216,6 @@ export default function Favorites() {
             </View>
           </View>
         </Modal>
-
       </View>
       <View style={style.cardWrapper}>
         <FlatList
