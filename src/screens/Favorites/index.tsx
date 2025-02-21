@@ -17,13 +17,19 @@ import { FlatList } from "react-native-gesture-handler";
 import { useFocusEffect } from "@react-navigation/native";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { BlurView } from "expo-blur";
+import { Audio } from "expo-av";
+import Swipeable from "react-native-gesture-handler/ReanimatedSwipeable";
 
 export default function Favorites() {
   const [favPokemons, setFavPokemons] = useState<Pokemon[]>([]);
+  const [selectedPokemon, setSelectedPokemon] = useState<Pokemon | null>(null);
 
   const [loading, setLoading] = useState(true);
 
-  const [visible, setVisible] = useState(false);
+  const [visibleClearAll, setVisibleClearAll] = useState(false);
+  const [visibleDelete, setVisibleDelete] = useState(false);
+
+  const [audioSelect, setAudioSelect] = useState(null);
 
   const getFavPokemons = async () => {
     const storageContent = await getFavsFromStorage();
@@ -37,31 +43,73 @@ export default function Favorites() {
     return result;
   };
 
-  function clearFavs() {
+  const saveFavListOnStorage = async (favPokemons: Pokemon[]) => {
+    await AsyncStorage.setItem("favPokemons", JSON.stringify(favPokemons));
+  }
+
+  async function clearFavs() {
     if (favPokemons == null) {
       Alert.alert("Você não tem nenhum Pokémon favorito.");
       return;
     }
 
     AsyncStorage.setItem("favPokemons", "");
+    await audioSelect.replayAsync();
     setFavPokemons([]);
-    setVisible(false);
+    setVisibleClearAll(false);
   }
+
+  async function loadSound() {
+    const { sound } = await Audio.Sound.createAsync(
+      require("../../assets/remove.mp3")
+    );
+    setAudioSelect(sound);
+  }
+
+  async function handleDelete(){
+    if(!selectedPokemon) return;
+
+    const newFavList = favPokemons.filter((favPokemon) => favPokemon.id != selectedPokemon.id);
+    setFavPokemons(newFavList);
+    saveFavListOnStorage(newFavList);
+    await audioSelect.replayAsync();
+    setVisibleDelete(false)
+  }
+
+  const renderRightActions = (item: Pokemon) => (
+    <View style={style.deleteButton}>
+        <TouchableOpacity
+          onPress={() => {
+            setSelectedPokemon(item);
+            setVisibleDelete(true);
+          }
+          }
+        >
+          <MaterialCommunityIcons name="trash-can" size={30} color="white" />
+        </TouchableOpacity>
+
+    </View>
+  );
+
+  useEffect(() => {
+    loadSound();
+  }, []);
 
   useFocusEffect(
     useCallback(() => {
       getFavPokemons();
-    }, [favPokemons])
+    }, [])
   );
 
   return (
     <View style={style.container}>
-      {visible && <BlurView style={style.blur} />}
+      {visibleClearAll && <BlurView style={style.blur} />}
+      {visibleDelete && <BlurView style={style.blur} />}
       <View style={style.header}>
         <Text style={style.title}>Favoritos</Text>
         <TouchableOpacity
           onPress={() => {
-            setVisible(true);
+            setVisibleClearAll(true);
           }}
         >
           <MaterialCommunityIcons name="broom" size={24} color="#d11507" />
@@ -79,7 +127,7 @@ export default function Favorites() {
         </View>
       )}
 
-      {favPokemons == null && (
+      {favPokemons.length == 0 && (
         <View style={style.loadingWrapper}>
           <LottieView
             style={style.animation}
@@ -94,7 +142,8 @@ export default function Favorites() {
       )}
 
       <View>
-        <Modal animationType="fade" transparent={true} visible={visible}>
+        {/* Modal do clear ALL */}
+        <Modal animationType="fade" transparent={true} visible={visibleClearAll}>
           <View style={style.centeredModal}>
             <View style={style.modalView}>
               <Text style={style.modalTitle}>
@@ -114,7 +163,7 @@ export default function Favorites() {
 
                 <TouchableOpacity
                   style={style.modalButton}
-                  onPress={() => setVisible(!visible)}
+                  onPress={() => setVisibleClearAll(!visibleClearAll)}
                 >
                   <Text style={{ color: "#d11507", fontWeight: "bold" }}>
                     Não
@@ -124,12 +173,46 @@ export default function Favorites() {
             </View>
           </View>
         </Modal>
+
+        {/* Modal delete */}
+        <Modal animationType="fade" transparent={true} visible={visibleDelete}>
+          <View style={style.centeredModal}>
+            <View style={style.modalView}>
+              <Text style={style.modalTitle}>
+                {" "}
+                Deseja remover {selectedPokemon.name.charAt(0).toUpperCase() + selectedPokemon.name.slice(1)}?{" "}
+              </Text>
+              <Text style={style.modalText}>
+                {" "}
+                Isso não poderá ser desfeito. Confirma?{" "}
+              </Text>
+              <View style={style.modalButtonGroup}>
+                <TouchableOpacity style={style.modalButton} onPress={handleDelete}>
+                  <Text style={{ color: "#9597F4", fontWeight: "bold" }}>
+                    Sim
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={style.modalButton}
+                  onPress={() => setVisibleDelete(!visibleDelete)}
+                >
+                  <Text style={{ color: "#d11507", fontWeight: "bold" }}>
+                    Não
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
+
       </View>
       <View style={style.cardWrapper}>
         <FlatList
           data={favPokemons}
           keyExtractor={(item) => item.name}
           renderItem={({ item }) => (
+            <Swipeable renderRightActions={() => renderRightActions(item)}>
               <View
                 style={[
                   style.cardContent,
@@ -142,6 +225,7 @@ export default function Favorites() {
                 </Text>
                 <Image source={{ uri: item.image }} style={style.image} />
               </View>
+            </Swipeable>
           )}
         />
       </View>
