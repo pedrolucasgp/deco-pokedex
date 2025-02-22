@@ -50,6 +50,7 @@ export default function Favorites() {
   async function clearFavs() {
     if (favPokemons == null || favPokemons.length == 0) {
       Alert.alert("Você não tem nenhum Pokémon favorito.");
+      setVisibleClearAll(false);
       return;
     }
 
@@ -127,20 +128,19 @@ export default function Favorites() {
         </View>
       )}
 
-      {favPokemons.length == 0 ||
-        (favPokemons == null && (
-          <View style={style.loadingWrapper}>
-            <LottieView
-              style={style.animation}
-              source={psyduckAnimation}
-              autoPlay
-              loop
-            />
-            <Text style={style.loadingText}>
-              Você não tem nenhum Pokémon adicionado como favorito!
-            </Text>
-          </View>
-        ))}
+      {(favPokemons == null || favPokemons.length == 0) && (
+        <View style={style.loadingWrapper}>
+          <LottieView
+            style={style.animation}
+            source={psyduckAnimation}
+            autoPlay
+            loop
+          />
+          <Text style={style.loadingText}>
+            Você não tem nenhum Pokémon adicionado como favorito!
+          </Text>
+        </View>
+      )}
 
       <View>
         {/* Modal do clear ALL */}

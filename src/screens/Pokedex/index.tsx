@@ -17,6 +17,7 @@ import pokeballLoading from "../../assets/pokeballLoading.json";
 import LottieView from "lottie-react-native";
 import { BlurView } from "expo-blur";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Audio } from "expo-av";
 
 export default function Pokedex() {
   const [pokemons, setPokemons] = useState<Pokemon[]>([]);
@@ -27,16 +28,26 @@ export default function Pokedex() {
 
   const [visible, setVisible] = useState(false);
 
+  const [existingFavs, setExistingFavs] = useState([]);
+
   const [selectedPokemon, setSelectedPokemon] = useState<Pokemon | null>(null);
 
-  const handleFavorite = async () => {
-    const existingFavs = await getFavsFromStorage();
+  const [audioSelect, setAudioSelect] = useState(null);
 
-    const alreadyExists = existingFavs.some(
+  async function handleModal(item) {
+    setSelectedPokemon(item);
+    const favorites = await getFavsFromStorage();
+    setExistingFavs(favorites);
+    setVisible(true);
+    await audioSelect.replayAsync();
+  }
+
+  const handleFavorite = async () => {
+    const isFavorited = existingFavs.some(
       (fav) => fav.id == selectedPokemon.id
     );
 
-    if (alreadyExists == false) {
+    if (isFavorited == false) {
       const updatedFavs = [...existingFavs, selectedPokemon];
 
       await sendFavsToStorage(updatedFavs);
@@ -47,6 +58,7 @@ export default function Pokedex() {
           " adicionado aos favoritos."
       );
 
+      setExistingFavs(updatedFavs);
       return;
     }
 
@@ -56,7 +68,7 @@ export default function Pokedex() {
         " já é um de seus favoritos."
     );
   };
-  
+
   const sendFavsToStorage = async (favPokemons: Pokemon[]) => {
     await AsyncStorage.setItem("favPokemons", JSON.stringify(favPokemons));
   };
@@ -147,11 +159,19 @@ export default function Pokedex() {
     }
   }, [searchValue]);
 
+  async function loadSound() {
+    const { sound } = await Audio.Sound.createAsync(
+      require("../../assets/openDetails.mp3")
+    );
+    setAudioSelect(sound);
+  }
+
+  useEffect(() => {
+    loadSound();
+  }, []);
+
   return (
     <View style={style.container}>
-
-      
-
       {visible && <BlurView style={style.blur} />}
       <View style={style.searchBar}>
         <MaterialCommunityIcons name="text-search" size={24} color="gray" />
@@ -184,18 +204,22 @@ export default function Pokedex() {
                   style={style.modalButton}
                   onPress={() => setVisible(!visible)}
                 >
-                  <MaterialCommunityIcons
-                    name="close"
-                    size={24}
-                    color="black"
-                  />
+                  <MaterialCommunityIcons name="close" size={24} color="gray" />
                 </TouchableOpacity>
 
                 <TouchableOpacity
                   style={style.modalButton}
                   onPress={handleFavorite}
                 >
-                  <MaterialCommunityIcons name="heart" size={24} color="gray" />
+                  <MaterialCommunityIcons
+                    name="heart"
+                    size={24}
+                    style={
+                      existingFavs.some((fav) => fav.id == selectedPokemon.id)
+                        ? { color: "red" }
+                        : { color: "gray" }
+                    }
+                  />
                 </TouchableOpacity>
               </View>
               <Text style={style.modalTitle}>
@@ -277,30 +301,6 @@ export default function Pokedex() {
                       </View>
                     )}
                   />
-                  {/* {selectedPokemon.evolutionLine.map((evolution, index) => (
-                    <View
-                      key={index}
-                      style={[
-                        style.evolutionCard,
-                        {
-                          backgroundColor: getTypeColor(evolution.types[0]),
-                        },
-                      ]}
-                    >
-                      {evolution.image && (
-                        <Image
-                          source={{ uri: evolution.image }}
-                          style={style.evolutionImage}
-                        />
-                      )}
-                      {evolution.name && (
-                        <Text style={style.evolutionText}>
-                          {evolution.name.charAt(0).toUpperCase() +
-                            evolution.name.slice(1)}
-                        </Text>
-                      )}
-                    </View>
-                  ))} */}
                 </View>
               )}
             </View>
@@ -316,8 +316,7 @@ export default function Pokedex() {
           <TouchableOpacity
             style={style.card}
             onPress={() => {
-              setVisible(true);
-              setSelectedPokemon(item);
+              handleModal(item);
             }}
           >
             <View
