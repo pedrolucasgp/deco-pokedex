@@ -19,6 +19,7 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { BlurView } from "expo-blur";
 import { Audio } from "expo-av";
 import Swipeable from "react-native-gesture-handler/ReanimatedSwipeable";
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function Favorites() {
   const [favPokemons, setFavPokemons] = useState<Pokemon[]>([]);
@@ -223,18 +224,24 @@ export default function Favorites() {
           keyExtractor={(item) => item.name}
           renderItem={({ item }) => (
             <Swipeable renderRightActions={() => renderRightActions(item)}>
-              <View
-                style={[
-                  style.cardContent,
-                  { backgroundColor: getTypeColor(item.types[0]) },
+              <LinearGradient
+                colors={[
+                  getTypeColor(item.types[0]),
+                  item.types[1] != null
+                    ? getTypeColor(item.types[1])
+                    : getTypeColor(item.types[0]),
                 ]}
+                start={{ x: 0.1, y: 1 }} 
+                end={{ x: 0.7, y: 0 }}
+                locations={[0.45, 0.9]}
+                style={style.cardContent}
               >
                 <Text style={style.pokemonNumber}>#{item.id}</Text>
                 <Text style={style.pokemonName}>
                   {item.name.charAt(0).toUpperCase() + item.name.slice(1)}
                 </Text>
                 <Image source={{ uri: item.image }} style={style.image} />
-              </View>
+              </LinearGradient>
             </Swipeable>
           )}
         />

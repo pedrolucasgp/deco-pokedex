@@ -138,6 +138,8 @@ export const style = StyleSheet.create({
   evolutionContainer: {
     alignItems: "center",
     justifyContent: "space-between",
+    height: "22%",
+    width: "100%",
     marginTop: 10,
   },
 

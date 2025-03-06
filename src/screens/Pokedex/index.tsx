@@ -18,6 +18,7 @@ import LottieView from "lottie-react-native";
 import { BlurView } from "expo-blur";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Audio } from "expo-av";
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function Pokedex() {
   const [pokemons, setPokemons] = useState<Pokemon[]>([]);
@@ -95,31 +96,55 @@ export default function Pokedex() {
           );
           const evolutionData = await evolutionResponse.json();
 
-          const getEvolutionChain = async (chain: any) => {
+          const getEvolutionChain = async (
+            chain: any,
+            visited: Set<string> = new Set()
+          ) => {
             let evolutions = [];
             let current = chain;
+
             while (current) {
               const pokemonName = current.species.name;
 
-              const pokemonResponse = await fetch(
-                `https://pokeapi.co/api/v2/pokemon/${pokemonName}`
-              );
-              const pokemonDetails = await pokemonResponse.json();
+              // verifica se o Pokémon já foi visitado
+              if (!visited.has(pokemonName)) {
+                visited.add(pokemonName); // marca ele como visitado
 
-              evolutions.push({
-                name: pokemonName,
-                image:
-                  pokemonDetails.sprites.other["official-artwork"]
-                    .front_default,
-                types: pokemonDetails.types.map(
-                  (t: { type: { name: string } }) => t.type.name
-                ),
-              });
-              current = current.evolves_to[0] || null;
+                const pokemonResponse = await fetch(
+                  `https://pokeapi.co/api/v2/pokemon/${pokemonName}`
+                );
+                const pokemonDetails = await pokemonResponse.json();
+
+                // add o Pokémon as evoluções
+                evolutions.push({
+                  name: pokemonName,
+                  image:
+                    pokemonDetails.sprites.other["official-artwork"]
+                      .front_default,
+                  types: pokemonDetails.types.map(
+                    (t: { type: { name: string } }) => t.type.name
+                  ),
+                });
+              }
+
+              // Processa as evoluções (ramificações)
+              if (current.evolves_to.length > 0) {
+                for (let evolve of current.evolves_to) {
+                  // concatena as evoluções e evita duplicação
+                  evolutions = evolutions.concat(
+                    await getEvolutionChain(evolve, visited)
+                  );
+                }
+              }
+
+              // passa para a próxima caso ela exista
+              current =
+                current.evolves_to.length > 0 ? current.evolves_to[0] : null;
             }
 
             return evolutions;
           };
+
           const evolutionLine = await getEvolutionChain(evolutionData.chain);
 
           return {
@@ -256,18 +281,21 @@ export default function Pokedex() {
                   </Text>
                 )}
               </View>
-
-              <View
-                style={[
-                  style.pokemonModal,
-                  { backgroundColor: getTypeColor(selectedPokemon?.types[0]) },
+              <LinearGradient
+                colors={[
+                  getTypeColor(selectedPokemon?.types[0]),
+                  selectedPokemon?.types[1] != null
+                    ? getTypeColor(selectedPokemon?.types[1])
+                    : getTypeColor(selectedPokemon?.types[0]),
                 ]}
+                locations={[0.45, 0.9]}
+                style={style.pokemonModal}
               >
                 <Image
                   source={{ uri: selectedPokemon?.image }}
                   style={style.image}
                 />
-              </View>
+              </LinearGradient>
 
               <View style={style.pokemonSpecies}>
                 <Text style={style.pokemonDetailsTitle}>Espécie</Text>
@@ -279,16 +307,20 @@ export default function Pokedex() {
               {selectedPokemon?.evolutionLine && (
                 <View style={style.evolutionContainer}>
                   <FlatList
-                    scrollEnabled={false}
-                    numColumns={3}
+                    horizontal={true}
+                    showsHorizontalScrollIndicator={false}
                     data={selectedPokemon.evolutionLine}
                     keyExtractor={(evo) => evo.name}
                     renderItem={({ item }) => (
-                      <View
-                        style={[
-                          style.evolutionCard,
-                          { backgroundColor: getTypeColor(item.types[0]) },
+                      <LinearGradient
+                        colors={[
+                          getTypeColor(item.types[0]),
+                          item.types[1] != null
+                            ? getTypeColor(item.types[1])
+                            : getTypeColor(item.types[0]),
                         ]}
+                        locations={[0.45, 0.9]}
+                        style={style.evolutionCard}
                       >
                         <Image
                           source={{ uri: item.image }}
@@ -298,7 +330,7 @@ export default function Pokedex() {
                           {item.name.charAt(0).toUpperCase() +
                             item.name.slice(1)}
                         </Text>
-                      </View>
+                      </LinearGradient>
                     )}
                   />
                 </View>
@@ -311,6 +343,7 @@ export default function Pokedex() {
       <FlatList
         numColumns={2}
         data={list}
+        showsHorizontalScrollIndicator={false}
         keyExtractor={(item) => item.name}
         renderItem={({ item }) => (
           <TouchableOpacity
@@ -319,18 +352,22 @@ export default function Pokedex() {
               handleModal(item);
             }}
           >
-            <View
-              style={[
-                style.cardContent,
-                { backgroundColor: getTypeColor(item.types[0]) },
+            <LinearGradient
+              colors={[
+                getTypeColor(item.types[0]),
+                item.types[1] != null
+                  ? getTypeColor(item.types[1])
+                  : getTypeColor(item.types[0]),
               ]}
+              locations={[0.45, 0.9]}
+              style={style.cardContent}
             >
               <Text style={style.pokemonNumber}>#{item.id}</Text>
               <Image source={{ uri: item.image }} style={style.image} />
               <Text style={style.pokemonName}>
                 {item.name.charAt(0).toUpperCase() + item.name.slice(1)}
               </Text>
-            </View>
+            </LinearGradient>
           </TouchableOpacity>
         )}
       />

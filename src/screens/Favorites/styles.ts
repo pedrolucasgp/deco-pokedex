@@ -106,6 +106,6 @@ export const style = StyleSheet.create({
     height: "80%",
     backgroundColor: "#ff474c",
     borderRadius: 10,
-    marginTop: 10
+    marginTop: 12
   }
 });
