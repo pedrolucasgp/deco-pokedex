@@ -30,6 +30,7 @@ export const style = StyleSheet.create({
   },
   cardWrapper: {
     marginTop: "15%",
+    marginBottom: "15%",
   },
   cardContent: {
     alignItems: "center",
@@ -106,6 +107,6 @@ export const style = StyleSheet.create({
     height: "80%",
     backgroundColor: "#ff474c",
     borderRadius: 10,
-    marginTop: 12
-  }
+    marginTop: 12,
+  },
 });

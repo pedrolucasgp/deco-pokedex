@@ -20,6 +20,7 @@ import { BlurView } from "expo-blur";
 import { Audio } from "expo-av";
 import Swipeable from "react-native-gesture-handler/ReanimatedSwipeable";
 import { LinearGradient } from "expo-linear-gradient";
+import DeleteFavoriteModal from "../../components/Modals/DeleteFavoriteModal";
 
 export default function Favorites() {
   const [favPokemons, setFavPokemons] = useState<Pokemon[]>([]);
@@ -30,7 +31,7 @@ export default function Favorites() {
   const [visibleClearAll, setVisibleClearAll] = useState(false);
   const [visibleDelete, setVisibleDelete] = useState(false);
 
-  const [audioSelect, setAudioSelect] = useState(null);
+  const closeModal = () => setVisibleDelete(false);
 
   const getFavPokemons = async () => {
     const storageContent = await getFavsFromStorage();
@@ -44,41 +45,25 @@ export default function Favorites() {
     return result;
   };
 
-  const saveFavListOnStorage = async (favPokemons: Pokemon[]) => {
-    await AsyncStorage.setItem("favPokemons", JSON.stringify(favPokemons));
-  };
+  // async function clearFavs() {
+  //   if (favPokemons == null || favPokemons.length == 0) {
+  //     Alert.alert("Você não tem nenhum Pokémon favorito.");
+  //     setVisibleClearAll(false);
+  //     return;
+  //   }
 
-  async function clearFavs() {
-    if (favPokemons == null || favPokemons.length == 0) {
-      Alert.alert("Você não tem nenhum Pokémon favorito.");
-      setVisibleClearAll(false);
-      return;
-    }
+  //   AsyncStorage.setItem("favPokemons", "");
+  //   await audioSelect.replayAsync();
+  //   setFavPokemons([]);
+  //   setVisibleClearAll(false);
+  // }
 
-    AsyncStorage.setItem("favPokemons", "");
-    await audioSelect.replayAsync();
-    setFavPokemons([]);
-    setVisibleClearAll(false);
-  }
-
-  async function loadSound() {
-    const { sound } = await Audio.Sound.createAsync(
-      require("../../assets/remove.mp3")
-    );
-    setAudioSelect(sound);
-  }
-
-  async function handleDelete() {
-    if (!selectedPokemon) return;
-
-    const newFavList = favPokemons.filter(
-      (favPokemon) => favPokemon.id != selectedPokemon.id
-    );
-    setFavPokemons(newFavList);
-    saveFavListOnStorage(newFavList);
-    await audioSelect.replayAsync();
-    setVisibleDelete(false);
-  }
+  // async function loadSound() {
+  //   const { sound } = await Audio.Sound.createAsync(
+  //     require("../../assets/remove.mp3")
+  //   );
+  //   setAudioSelect(sound);
+  // }
 
   const renderRightActions = (item: Pokemon) => (
     <View style={style.deleteButton}>
@@ -94,7 +79,7 @@ export default function Favorites() {
   );
 
   useEffect(() => {
-    loadSound();
+    // loadSound();
   }, []);
 
   useFocusEffect(
@@ -161,7 +146,8 @@ export default function Favorites() {
                 Isso não poderá ser desfeito. Confirma?{" "}
               </Text>
               <View style={style.modalButtonGroup}>
-                <TouchableOpacity style={style.modalButton} onPress={clearFavs}>
+                <TouchableOpacity style={style.modalButton}>
+                  {/* colocar onPress */}
                   <Text style={{ color: "#9597F4", fontWeight: "bold" }}>
                     Sim
                   </Text>
@@ -179,9 +165,16 @@ export default function Favorites() {
             </View>
           </View>
         </Modal>
+        <DeleteFavoriteModal
+          visibleDelete={visibleDelete}
+          onClose={closeModal}
+          selectedPokemon={selectedPokemon}
+          favPokemons={favPokemons}
+          setFavPokemons={setFavPokemons}
+        />
 
         {/* Modal delete */}
-        <Modal animationType="fade" transparent={true} visible={visibleDelete}>
+        {/* <Modal animationType="fade" transparent={true} visible={visibleDelete}>
           <View style={style.centeredModal}>
             <View style={style.modalView}>
               <Text style={style.modalTitle}>
@@ -216,7 +209,7 @@ export default function Favorites() {
               </View>
             </View>
           </View>
-        </Modal>
+        </Modal> */}
       </View>
       <View style={style.cardWrapper}>
         <FlatList
@@ -231,7 +224,7 @@ export default function Favorites() {
                     ? getTypeColor(item.types[1])
                     : getTypeColor(item.types[0]),
                 ]}
-                start={{ x: 0.1, y: 1 }} 
+                start={{ x: 0.1, y: 1 }}
                 end={{ x: 0.7, y: 0 }}
                 locations={[0.45, 0.9]}
                 style={style.cardContent}
