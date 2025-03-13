@@ -11,7 +11,7 @@ import {
   View,
 } from "react-native";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { fetchPokemons } from "../../services/api";
+import { fetchPokemons, fetchPokemonsData } from "../../services/api";
 import { Pokemon, getTypeColor } from "../../@types/pokemon";
 import pokeballLoading from "../../assets/pokeballLoading.json";
 import LottieView from "lottie-react-native";
@@ -82,88 +82,10 @@ export default function Pokedex() {
   useEffect(() => {
     const loadPokemons = async () => {
       const data = await fetchPokemons();
+      const evolveData = await fetchPokemonsData(data);
 
-      const fetchPokemonsData: Pokemon[] = await Promise.all(
-        data.map(async (item: { name: string; url: string }) => {
-          const response = await fetch(item.url);
-          const details = await response.json();
-
-          const speciesResponse = await fetch(details.species.url);
-          const speciesDetails = await speciesResponse.json();
-
-          const evolutionResponse = await fetch(
-            speciesDetails.evolution_chain.url
-          );
-          const evolutionData = await evolutionResponse.json();
-
-          const getEvolutionChain = async (
-            chain: any,
-            visited: Set<string> = new Set()
-          ) => {
-            let evolutions = [];
-            let current = chain;
-
-            while (current) {
-              const pokemonName = current.species.name;
-
-              // verifica se o Pokémon já foi visitado
-              if (!visited.has(pokemonName)) {
-                visited.add(pokemonName); // marca ele como visitado
-
-                const pokemonResponse = await fetch(
-                  `https://pokeapi.co/api/v2/pokemon/${pokemonName}`
-                );
-                const pokemonDetails = await pokemonResponse.json();
-
-                // add o Pokémon as evoluções
-                evolutions.push({
-                  name: pokemonName,
-                  image:
-                    pokemonDetails.sprites.other["official-artwork"]
-                      .front_default,
-                  types: pokemonDetails.types.map(
-                    (t: { type: { name: string } }) => t.type.name
-                  ),
-                });
-              }
-
-              // Processa as evoluções (ramificações)
-              if (current.evolves_to.length > 0) {
-                for (let evolve of current.evolves_to) {
-                  // concatena as evoluções e evita duplicação
-                  evolutions = evolutions.concat(
-                    await getEvolutionChain(evolve, visited)
-                  );
-                }
-              }
-
-              // passa para a próxima caso ela exista
-              current =
-                current.evolves_to.length > 0 ? current.evolves_to[0] : null;
-            }
-
-            return evolutions;
-          };
-
-          const evolutionLine = await getEvolutionChain(evolutionData.chain);
-
-          return {
-            id: details.id,
-            name: item.name,
-            image: details.sprites.other["official-artwork"].front_default,
-            types: details.types.map(
-              (t: { type: { name: string } }) => t.type.name
-            ),
-            species:
-              speciesDetails.genera.find((g: any) => g.language.name === "en")
-                ?.genus || "Unknown",
-            evolutionLine,
-          };
-        })
-      );
-
-      setPokemons(fetchPokemonsData);
-      setList(fetchPokemonsData);
+      setPokemons(evolveData);
+      setList(evolveData);
       setLoading(false);
     };
 

@@ -1,12 +1,5 @@
-import React, { useCallback, useEffect, useState } from "react";
-import {
-  Image,
-  Text,
-  TouchableOpacity,
-  View,
-  Alert,
-  Modal,
-} from "react-native";
+import React, { useCallback, useState } from "react";
+import { Image, Text, TouchableOpacity, View } from "react-native";
 import { style } from "./styles";
 import pokeballLoading from "../../assets/pokeballLoading.json";
 import psyduckAnimation from "../../assets/psyduckAnimation.json";
@@ -17,10 +10,10 @@ import { FlatList } from "react-native-gesture-handler";
 import { useFocusEffect } from "@react-navigation/native";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { BlurView } from "expo-blur";
-import { Audio } from "expo-av";
 import Swipeable from "react-native-gesture-handler/ReanimatedSwipeable";
 import { LinearGradient } from "expo-linear-gradient";
 import DeleteFavoriteModal from "../../components/Modals/DeleteFavoriteModal";
+import ClearAllModal from "../../components/Modals/ClearAllModal";
 
 export default function Favorites() {
   const [favPokemons, setFavPokemons] = useState<Pokemon[]>([]);
@@ -31,7 +24,8 @@ export default function Favorites() {
   const [visibleClearAll, setVisibleClearAll] = useState(false);
   const [visibleDelete, setVisibleDelete] = useState(false);
 
-  const closeModal = () => setVisibleDelete(false);
+  const closeClearModal = () => setVisibleClearAll(false);
+  const closeDeleteModal = () => setVisibleDelete(false);
 
   const getFavPokemons = async () => {
     const storageContent = await getFavsFromStorage();
@@ -45,42 +39,19 @@ export default function Favorites() {
     return result;
   };
 
-  // async function clearFavs() {
-  //   if (favPokemons == null || favPokemons.length == 0) {
-  //     Alert.alert("Você não tem nenhum Pokémon favorito.");
-  //     setVisibleClearAll(false);
-  //     return;
-  //   }
-
-  //   AsyncStorage.setItem("favPokemons", "");
-  //   await audioSelect.replayAsync();
-  //   setFavPokemons([]);
-  //   setVisibleClearAll(false);
-  // }
-
-  // async function loadSound() {
-  //   const { sound } = await Audio.Sound.createAsync(
-  //     require("../../assets/remove.mp3")
-  //   );
-  //   setAudioSelect(sound);
-  // }
-
   const renderRightActions = (item: Pokemon) => (
-    <View style={style.deleteButton}>
+    <View style={style.deleteWrapper}>
       <TouchableOpacity
         onPress={() => {
           setSelectedPokemon(item);
           setVisibleDelete(true);
         }}
+        style={style.deleteButton}
       >
         <MaterialCommunityIcons name="trash-can" size={30} color="white" />
       </TouchableOpacity>
     </View>
   );
-
-  useEffect(() => {
-    // loadSound();
-  }, []);
 
   useFocusEffect(
     useCallback(() => {
@@ -92,6 +63,7 @@ export default function Favorites() {
     <View style={style.container}>
       {visibleClearAll && <BlurView style={style.blur} />}
       {visibleDelete && <BlurView style={style.blur} />}
+
       <View style={style.header}>
         <Text style={style.title}>Favoritos</Text>
         <TouchableOpacity
@@ -102,7 +74,9 @@ export default function Favorites() {
           <MaterialCommunityIcons name="broom" size={24} color="#d11507" />
         </TouchableOpacity>
       </View>
-      {loading && (
+
+      {loading ? (
+        // Exibe a animação de carregamento se loading for true
         <View style={style.loadingWrapper}>
           <LottieView
             style={style.animation}
@@ -112,9 +86,8 @@ export default function Favorites() {
           />
           <Text style={style.loadingText}>Carregando...</Text>
         </View>
-      )}
-
-      {(favPokemons == null || favPokemons.length == 0) && (
+      ) : favPokemons == null || favPokemons.length == 0 ? (
+        // Exibe a animação do Psyduck se não houver favoritos
         <View style={style.loadingWrapper}>
           <LottieView
             style={style.animation}
@@ -126,119 +99,55 @@ export default function Favorites() {
             Você não tem nenhum Pokémon adicionado como favorito!
           </Text>
         </View>
+      ) : (
+        // Renderiza o conteúdo principal se não estiver carregando e houver favoritos
+        <>
+          <View>
+            <ClearAllModal
+              visibleClearAll={visibleClearAll}
+              onClose={closeClearModal}
+              favPokemons={favPokemons}
+              setFavPokemons={setFavPokemons}
+            />
+            <DeleteFavoriteModal
+              visibleDelete={visibleDelete}
+              onClose={closeDeleteModal}
+              selectedPokemon={selectedPokemon}
+              favPokemons={favPokemons}
+              setFavPokemons={setFavPokemons}
+            />
+          </View>
+
+          <View style={style.cardWrapper}>
+            <FlatList
+              data={favPokemons}
+              keyExtractor={(item) => item.name}
+              renderItem={({ item }) => (
+                <Swipeable renderRightActions={() => renderRightActions(item)}>
+                  <LinearGradient
+                    colors={[
+                      getTypeColor(item.types[0]),
+                      item.types[1] != null
+                        ? getTypeColor(item.types[1])
+                        : getTypeColor(item.types[0]),
+                    ]}
+                    start={{ x: 0.1, y: 1 }}
+                    end={{ x: 0.7, y: 0 }}
+                    locations={[0.45, 0.9]}
+                    style={style.cardContent}
+                  >
+                    <Text style={style.pokemonNumber}>#{item.id}</Text>
+                    <Text style={style.pokemonName}>
+                      {item.name.charAt(0).toUpperCase() + item.name.slice(1)}
+                    </Text>
+                    <Image source={{ uri: item.image }} style={style.image} />
+                  </LinearGradient>
+                </Swipeable>
+              )}
+            />
+          </View>
+        </>
       )}
-
-      <View>
-        {/* Modal do clear ALL */}
-        <Modal
-          animationType="fade"
-          transparent={true}
-          visible={visibleClearAll}
-        >
-          <View style={style.centeredModal}>
-            <View style={style.modalView}>
-              <Text style={style.modalTitle}>
-                {" "}
-                Excluir todos os favoritos?{" "}
-              </Text>
-              <Text style={style.modalText}>
-                {" "}
-                Isso não poderá ser desfeito. Confirma?{" "}
-              </Text>
-              <View style={style.modalButtonGroup}>
-                <TouchableOpacity style={style.modalButton}>
-                  {/* colocar onPress */}
-                  <Text style={{ color: "#9597F4", fontWeight: "bold" }}>
-                    Sim
-                  </Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={style.modalButton}
-                  onPress={() => setVisibleClearAll(!visibleClearAll)}
-                >
-                  <Text style={{ color: "#d11507", fontWeight: "bold" }}>
-                    Não
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        </Modal>
-        <DeleteFavoriteModal
-          visibleDelete={visibleDelete}
-          onClose={closeModal}
-          selectedPokemon={selectedPokemon}
-          favPokemons={favPokemons}
-          setFavPokemons={setFavPokemons}
-        />
-
-        {/* Modal delete */}
-        {/* <Modal animationType="fade" transparent={true} visible={visibleDelete}>
-          <View style={style.centeredModal}>
-            <View style={style.modalView}>
-              <Text style={style.modalTitle}>
-                {" "}
-                Deseja remover{" "}
-                {selectedPokemon?.name.charAt(0).toUpperCase() +
-                  selectedPokemon?.name.slice(1)}
-                ?{" "}
-              </Text>
-              <Text style={style.modalText}>
-                {" "}
-                Isso não poderá ser desfeito. Confirma?{" "}
-              </Text>
-              <View style={style.modalButtonGroup}>
-                <TouchableOpacity
-                  style={style.modalButton}
-                  onPress={handleDelete}
-                >
-                  <Text style={{ color: "#9597F4", fontWeight: "bold" }}>
-                    Sim
-                  </Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={style.modalButton}
-                  onPress={() => setVisibleDelete(!visibleDelete)}
-                >
-                  <Text style={{ color: "#d11507", fontWeight: "bold" }}>
-                    Não
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        </Modal> */}
-      </View>
-      <View style={style.cardWrapper}>
-        <FlatList
-          data={favPokemons}
-          keyExtractor={(item) => item.name}
-          renderItem={({ item }) => (
-            <Swipeable renderRightActions={() => renderRightActions(item)}>
-              <LinearGradient
-                colors={[
-                  getTypeColor(item.types[0]),
-                  item.types[1] != null
-                    ? getTypeColor(item.types[1])
-                    : getTypeColor(item.types[0]),
-                ]}
-                start={{ x: 0.1, y: 1 }}
-                end={{ x: 0.7, y: 0 }}
-                locations={[0.45, 0.9]}
-                style={style.cardContent}
-              >
-                <Text style={style.pokemonNumber}>#{item.id}</Text>
-                <Text style={style.pokemonName}>
-                  {item.name.charAt(0).toUpperCase() + item.name.slice(1)}
-                </Text>
-                <Image source={{ uri: item.image }} style={style.image} />
-              </LinearGradient>
-            </Swipeable>
-          )}
-        />
-      </View>
     </View>
   );
 }

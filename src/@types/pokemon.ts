@@ -1,4 +1,4 @@
-export interface Evolution{
+export interface Evolution {
   name: string;
   image: string;
   types: string[];
@@ -36,5 +36,5 @@ export const typesColors = {
 };
 
 export const getTypeColor = (type: string) => {
-    return typesColors[type as keyof typeof typesColors] || '#B0B0B0';
+  return typesColors[type as keyof typeof typesColors] || "#B0B0B0";
 };
