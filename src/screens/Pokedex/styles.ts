@@ -1,5 +1,4 @@
 import { StyleSheet } from "react-native";
-import { createNativeWrapper } from "react-native-gesture-handler";
 
 export const style = StyleSheet.create({
   container: {
@@ -11,8 +10,14 @@ export const style = StyleSheet.create({
     backgroundColor: "#fffafa",
     justifyContent: "space-around",
   },
-  searchBar: {
+  header: {
     width: "100%",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 15,
+  },
+  searchBar: {
+    width: "90%",
     flexDirection: "row",
     alignItems: "center",
     borderRadius: 10,
@@ -35,8 +40,9 @@ export const style = StyleSheet.create({
     padding: 15,
   },
   pokemonNumber: {
-    fontSize: 15,
-    marginRight: "70%",
+    fontSize: 20,
+    width: "100%",
+    marginBottom: 15,
   },
   pokemonName: {
     fontSize: 20,

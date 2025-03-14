@@ -15,13 +15,13 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { LinearGradient } from "expo-linear-gradient";
 
 interface PokemonDetailsModalProps {
-  visible: boolean;
+  visibleDetails: boolean;
   onClose: () => void;
   selectedPokemon: Pokemon;
 }
 
 const PokemonDetailsModal = ({
-  visible,
+  visibleDetails,
   onClose,
   selectedPokemon,
 }: PokemonDetailsModalProps) => {
@@ -59,7 +59,7 @@ const PokemonDetailsModal = ({
   };
 
   return (
-    <Modal animationType="slide" transparent={true} visible={visible}>
+    <Modal animationType="slide" transparent={true} visible={visibleDetails}>
       <View style={style.modalWrapper}>
         <View style={style.modalView}>
           <View style={style.modalButtonWrapper}>
@@ -137,42 +137,44 @@ const PokemonDetailsModal = ({
             </Text>
           </View>
           <Text style={style.pokemonDetailsTitle}>Linha de Evolução</Text>
-          {selectedPokemon.evolutionLine.length > 1 ? (
-            <View style={style.evolutionContainer}>
-              <FlatList
-                horizontal={true}
-                showsHorizontalScrollIndicator={false}
-                data={selectedPokemon.evolutionLine}
-                keyExtractor={(evo) => evo.name}
-                renderItem={({ item }) => (
-                  <LinearGradient
-                    colors={[
-                      getTypeColor(item.types[0]),
-                      item.types[1] != null
-                        ? getTypeColor(item.types[1])
-                        : getTypeColor(item.types[0]),
-                    ]}
-                    locations={[0.45, 0.9]}
-                    style={style.evolutionCard}
-                  >
-                    <Image
-                      source={{ uri: item.image }}
-                      style={style.evolutionImage}
-                    />
-                    <Text style={style.evolutionText}>
-                      {item.name.charAt(0).toUpperCase() + item.name.slice(1)}
-                    </Text>
-                  </LinearGradient>
-                )}
-              />
-            </View>
-          ) : (
-            <View>
-              <Text style={style.pokemonDetailsText}>
-                Este Pokémon não tem evoluções.
-              </Text>
-            </View>
-          )}
+          {selectedPokemon && selectedPokemon.evolutionLine ? (
+            selectedPokemon.evolutionLine.length > 1 ? (
+              <View style={style.evolutionContainer}>
+                <FlatList
+                  horizontal={true}
+                  showsHorizontalScrollIndicator={false}
+                  data={selectedPokemon.evolutionLine}
+                  keyExtractor={(evo) => evo.name}
+                  renderItem={({ item }) => (
+                    <LinearGradient
+                      colors={[
+                        getTypeColor(item.types[0]),
+                        item.types[1] != null
+                          ? getTypeColor(item.types[1])
+                          : getTypeColor(item.types[0]),
+                      ]}
+                      locations={[0.45, 0.9]}
+                      style={style.evolutionCard}
+                    >
+                      <Image
+                        source={{ uri: item.image }}
+                        style={style.evolutionImage}
+                      />
+                      <Text style={style.evolutionText}>
+                        {item.name.charAt(0).toUpperCase() + item.name.slice(1)}
+                      </Text>
+                    </LinearGradient>
+                  )}
+                />
+              </View>
+            ) : (
+              <View>
+                <Text style={style.pokemonDetailsText}>
+                  Este Pokémon não tem evoluções.
+                </Text>
+              </View>
+            )
+          ) : null}
         </View>
       </View>
     </Modal>

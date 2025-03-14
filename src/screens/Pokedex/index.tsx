@@ -17,6 +17,7 @@ import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
 import PokemonDetailsModal from "../../components/Modals/PokemonDetailsModal";
 import { Audio } from "expo-av";
+import FilterModal from "../../components/Modals/FilterModal";
 
 export default function Pokedex() {
   const [pokemons, setPokemons] = useState<Pokemon[]>([]);
@@ -25,19 +26,29 @@ export default function Pokedex() {
   const [searchValue, setSearchValue] = useState("");
   const [list, setList] = useState(pokemons);
 
-  const [visible, setVisible] = useState(false);
+  const [visibleDetails, setVisibleDetails] = useState(false);
+  const [visibleFilter, setVisibleFilter] = useState(false);
 
   const [audioSelect, setAudioSelect] = useState(null);
 
   const [selectedPokemon, setSelectedPokemon] = useState<Pokemon | null>(null);
 
-  const closeModal = () => setVisible(false);
+  const [limit, setLimit] = useState(1025);
+  const [offset, setOffset] = useState(0);
+
+  const closeDetailsModal = () => setVisibleDetails(false);
+  const closeFilterModal = () => setVisibleFilter(false);
 
   async function handleModal(item) {
-    setVisible(true);
+    setVisibleDetails(true);
     setSelectedPokemon(item);
     await audioSelect.replayAsync();
   }
+
+  const handleFilter = (newLimit: number, newOffset: number) => {
+    setLimit(newLimit);
+    setOffset(newOffset);
+  };
 
   async function loadSound() {
     const { sound } = await Audio.Sound.createAsync(
@@ -52,7 +63,7 @@ export default function Pokedex() {
 
   useEffect(() => {
     const loadPokemons = async () => {
-      const data = await fetchPokemons();
+      const data = await fetchPokemons(limit, offset);
       const evolveData = await fetchPokemonsData(data);
 
       setPokemons(evolveData);
@@ -61,7 +72,7 @@ export default function Pokedex() {
     };
 
     loadPokemons();
-  }, []);
+  }, [limit, offset]);
 
   useEffect(() => {
     if (!searchValue) {
@@ -79,15 +90,26 @@ export default function Pokedex() {
 
   return (
     <View style={style.container}>
-      {visible && <BlurView style={style.blur} />}
-      <View style={style.searchBar}>
-        <MaterialCommunityIcons name="text-search" size={24} color="gray" />
-        <TextInput
-          placeholder="Busque um Pokémon. Ex. Mew ou 151..."
-          value={searchValue}
-          onChangeText={setSearchValue}
-          style={{ flex: 1 }}
-        />
+      {visibleDetails && <BlurView style={style.blur} />}
+      {visibleFilter && <BlurView style={style.blur} />}
+
+      <View style={style.header}>
+        <View style={style.searchBar}>
+          <MaterialCommunityIcons name="text-search" size={24} color="gray" />
+          <TextInput
+            placeholder="Busque um Pokémon. Ex. Mew ou 151..."
+            value={searchValue}
+            onChangeText={setSearchValue}
+            style={{ flex: 1 }}
+          />
+        </View>
+        <TouchableOpacity
+          onPress={() => {
+            setVisibleFilter(true);
+          }}
+        >
+          <MaterialCommunityIcons name="filter-menu" size={24} color="gray" />
+        </TouchableOpacity>
       </View>
 
       {loading && (
@@ -102,9 +124,14 @@ export default function Pokedex() {
         </View>
       )}
       <PokemonDetailsModal
-        visible={visible}
-        onClose={closeModal}
+        visibleDetails={visibleDetails}
+        onClose={closeDetailsModal}
         selectedPokemon={selectedPokemon}
+      />
+      <FilterModal
+        visibleFilter={visibleFilter}
+        onClose={closeFilterModal}
+        onFilter={handleFilter}
       />
       <FlatList
         numColumns={2}

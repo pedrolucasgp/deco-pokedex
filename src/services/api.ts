@@ -15,7 +15,7 @@ export const api = axios.create({
 // Galar: 810 - 905
 // Paldea: 906 - 1025
 
-export const fetchPokemons = async (limit = 151, offset = 0) => {
+export const fetchPokemons = async (limit = 1025, offset = 0) => {
   try {
     const response = await api.get(`/pokemon?limit=${limit}&offset=${offset}`);
     return response.data.results;
@@ -42,10 +42,14 @@ export const fetchPokemonsData = async (
         const pokemonResponse = await api.get(`/pokemon/${pokemonName}`);
         const pokemonDetails = await pokemonResponse.data;
 
+        const image =
+          pokemonDetails.sprites?.other?.["official-artwork"]?.front_default ||
+          pokemonDetails.sprites?.front_default;
+
         evolutions.push({
           name: pokemonName,
           id: pokemonDetails.id,
-          image: pokemonDetails.sprites.other["official-artwork"].front_default,
+          image: image,
           types: pokemonDetails.types.map(
             (t: { type: { name: string } }) => t.type.name
           ),
