@@ -55,9 +55,11 @@ export const style = StyleSheet.create({
   },
   header: {
     position: "absolute",
-    marginTop: "30%",
     flexDirection: "row",
-    gap: "65%",
+    gap: "68%",
+    margin: "10%",
+    zIndex: 1,
+    alignItems: "center",
   },
   blur: {
     width: "100%",

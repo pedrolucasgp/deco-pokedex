@@ -25,7 +25,6 @@ export const fetchPokemons = async (limit = 151, offset = 0) => {
   }
 };
 
-// Função para buscar dados completos dos Pokémon
 export const fetchPokemonsData = async (
   data: { name: string; url: string }[]
 ): Promise<Pokemon[]> => {

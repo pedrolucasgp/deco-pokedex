@@ -60,10 +60,7 @@ export default function Favorites() {
   );
 
   return (
-    <View style={style.container}>
-      {visibleClearAll && <BlurView style={style.blur} />}
-      {visibleDelete && <BlurView style={style.blur} />}
-
+    <>
       <View style={style.header}>
         <Text style={style.title}>Favoritos</Text>
         <TouchableOpacity
@@ -74,80 +71,83 @@ export default function Favorites() {
           <MaterialCommunityIcons name="broom" size={24} color="#d11507" />
         </TouchableOpacity>
       </View>
+      <View style={style.container}>
+        {visibleClearAll && <BlurView style={style.blur} />}
+        {visibleDelete && <BlurView style={style.blur} />}
 
-      {loading ? (
-        // Exibe a animação de carregamento se loading for true
-        <View style={style.loadingWrapper}>
-          <LottieView
-            style={style.animation}
-            source={pokeballLoading}
-            autoPlay
-            loop
-          />
-          <Text style={style.loadingText}>Carregando...</Text>
-        </View>
-      ) : favPokemons == null || favPokemons.length == 0 ? (
-        // Exibe a animação do Psyduck se não houver favoritos
-        <View style={style.loadingWrapper}>
-          <LottieView
-            style={style.animation}
-            source={psyduckAnimation}
-            autoPlay
-            loop
-          />
-          <Text style={style.loadingText}>
-            Você não tem nenhum Pokémon adicionado como favorito!
-          </Text>
-        </View>
-      ) : (
-        // Renderiza o conteúdo principal se não estiver carregando e houver favoritos
-        <>
-          <View>
-            <ClearAllModal
-              visibleClearAll={visibleClearAll}
-              onClose={closeClearModal}
-              favPokemons={favPokemons}
-              setFavPokemons={setFavPokemons}
+        {loading ? (
+          <View style={style.loadingWrapper}>
+            <LottieView
+              style={style.animation}
+              source={pokeballLoading}
+              autoPlay
+              loop
             />
-            <DeleteFavoriteModal
-              visibleDelete={visibleDelete}
-              onClose={closeDeleteModal}
-              selectedPokemon={selectedPokemon}
-              favPokemons={favPokemons}
-              setFavPokemons={setFavPokemons}
-            />
+            <Text style={style.loadingText}>Carregando...</Text>
           </View>
+        ) : favPokemons == null || favPokemons.length == 0 ? (
+          <View style={style.loadingWrapper}>
+            <LottieView
+              style={style.animation}
+              source={psyduckAnimation}
+              autoPlay
+              loop
+            />
+            <Text style={style.loadingText}>
+              Você não tem nenhum Pokémon adicionado como favorito!
+            </Text>
+          </View>
+        ) : (
+          <>
+            <View>
+              <ClearAllModal
+                visibleClearAll={visibleClearAll}
+                onClose={closeClearModal}
+                favPokemons={favPokemons}
+                setFavPokemons={setFavPokemons}
+              />
+              <DeleteFavoriteModal
+                visibleDelete={visibleDelete}
+                onClose={closeDeleteModal}
+                selectedPokemon={selectedPokemon}
+                favPokemons={favPokemons}
+                setFavPokemons={setFavPokemons}
+              />
+            </View>
 
-          <View style={style.cardWrapper}>
-            <FlatList
-              data={favPokemons}
-              keyExtractor={(item) => item.name}
-              renderItem={({ item }) => (
-                <Swipeable renderRightActions={() => renderRightActions(item)}>
-                  <LinearGradient
-                    colors={[
-                      getTypeColor(item.types[0]),
-                      item.types[1] != null
-                        ? getTypeColor(item.types[1])
-                        : getTypeColor(item.types[0]),
-                    ]}
-                    start={{ x: 0.1, y: 1 }}
-                    end={{ x: 0.7, y: 0 }}
-                    locations={[0.45, 0.9]}
-                    style={style.cardContent}
+            <View style={style.cardWrapper}>
+              <FlatList
+                data={favPokemons}
+                keyExtractor={(item) => item.name}
+                renderItem={({ item }) => (
+                  <Swipeable
+                    renderRightActions={() => renderRightActions(item)}
                   >
-                    <Text style={style.pokemonNumber}>#{item.id}</Text>
-                    <Text style={style.pokemonName}>
-                      {item.name.charAt(0).toUpperCase() + item.name.slice(1)}
-                    </Text>
-                    <Image source={{ uri: item.image }} style={style.image} />
-                  </LinearGradient>
-                </Swipeable>
-              )}
-            />
-          </View>
-        </>
-      )}
-    </View>
+                    <LinearGradient
+                      colors={[
+                        getTypeColor(item.types[0]),
+                        item.types[1] != null
+                          ? getTypeColor(item.types[1])
+                          : getTypeColor(item.types[0]),
+                      ]}
+                      start={{ x: 0.1, y: 1 }}
+                      end={{ x: 0.7, y: 0 }}
+                      locations={[0.45, 0.9]}
+                      style={style.cardContent}
+                    >
+                      <Text style={style.pokemonNumber}>#{item.id}</Text>
+                      <Text style={style.pokemonName}>
+                        {item.name.charAt(0).toUpperCase() + item.name.slice(1)}
+                      </Text>
+                      <Image source={{ uri: item.image }} style={style.image} />
+                    </LinearGradient>
+                  </Swipeable>
+                )}
+              />
+            </View>
+          </>
+        )}
+      </View>
+    </>
   );
 }
