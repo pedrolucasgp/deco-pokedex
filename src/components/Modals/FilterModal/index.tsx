@@ -1,7 +1,19 @@
-import React, { useState } from "react";
-import { Modal, Text, TouchableOpacity, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+  FlatList,
+  Image,
+  Modal,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { style } from "./styles";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import {
+  fetchStarterPokemonsImages,
+  starterPokemons,
+} from "../../../services/api";
+import { Audio } from "expo-av";
 
 interface FilterModalProps {
   visibleFilter: boolean;
@@ -15,10 +27,25 @@ const FilterModal = ({
   onFilter,
 }: FilterModalProps) => {
   const [selectedGeneration, setSelectedGeneration] = useState<number | null>(
-    null
+    0
   );
 
-  const handleFilter = (gen: number) => {
+  const [starterImages, setStarterImages] = useState<{
+    [key: number]: string[];
+  }>({});
+
+  const [audioSelect, setAudioSelect] = useState(null);
+
+  useEffect(() => {
+    const loadStarterImages = async () => {
+      const images = await fetchStarterPokemonsImages();
+      setStarterImages(images);
+    };
+
+    loadStarterImages();
+  }, []);
+
+  const handleFilter = async (gen: number) => {
     setSelectedGeneration(gen);
     let limit = 0;
     let offset = 0;
@@ -68,7 +95,19 @@ const FilterModal = ({
 
     onFilter(limit, offset);
     onClose();
+    await audioSelect.replayAsync();
   };
+
+  async function loadSound() {
+    const { sound } = await Audio.Sound.createAsync(
+      require("../../../assets/select.mp3")
+    );
+    setAudioSelect(sound);
+  }
+
+  useEffect(() => {
+    loadSound();
+  }, []);
 
   return (
     <Modal
@@ -87,27 +126,37 @@ const FilterModal = ({
           <Text style={style.modalText}>
             Selecione uma geração para filtrar:
           </Text>
-          <View style={style.modalButtonGroup}>
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((gen) => (
-              <TouchableOpacity
-                key={gen}
-                style={[
-                  style.modalButton,
-                  selectedGeneration === gen && style.selectedButton,
-                ]}
-                onPress={() => handleFilter(gen)}
-              >
-                <Text
-                  style={{
-                    color: selectedGeneration === gen ? "#FFFFFF" : "#9597F4",
-                    fontWeight: "bold",
-                  }}
+
+          <FlatList
+            data={starterPokemons}
+            keyExtractor={(item) => item.gen.toString()}
+            numColumns={2}
+            renderItem={({ item }) => (
+              <View style={style.modalButtonGroup}>
+                <TouchableOpacity
+                  style={style.modalButton}
+                  onPress={() => handleFilter(item.gen)}
                 >
-                  Gen {gen}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
+                  <Text style={style.modalText}>{item.name}</Text>
+                  <View style={style.pokemonImagesContainer}>
+                    {starterImages[item.gen]?.map((imageUrl, index) => (
+                      <Image
+                        key={index}
+                        source={{ uri: imageUrl }}
+                        style={[
+                          style.pokemonImage,
+                          {
+                            tintColor:
+                              selectedGeneration === item.gen ? null : "black",
+                          },
+                        ]}
+                      />
+                    ))}
+                  </View>
+                </TouchableOpacity>
+              </View>
+            )}
+          />
         </View>
       </View>
     </Modal>

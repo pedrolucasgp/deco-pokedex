@@ -30,19 +30,19 @@ export const style = StyleSheet.create({
     flexWrap: "wrap",
     alignItems: "center",
     justifyContent: "center",
-    width: "auto",
+    width: "50%",
     height: "auto",
-    gap: 50,
-    display: "flex",
+    padding: 10,
   },
   modalButton: {
     alignItems: "center",
     justifyContent: "center",
-    flexDirection: "row",
-    width: "30%",
-    height: 30,
+    flexDirection: "column",
+    width: "auto",
+    height: "auto",
     borderRadius: 10,
     borderWidth: 0.5,
+    padding: 10,
   },
   closeButton: {
     position: "absolute",
@@ -51,5 +51,15 @@ export const style = StyleSheet.create({
   },
   selectedButton: {
     backgroundColor: "red",
+  },
+  pokemonImagesContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  pokemonImage: {
+    width: 40,
+    height: 40,
+    marginHorizontal: 2,
   },
 });

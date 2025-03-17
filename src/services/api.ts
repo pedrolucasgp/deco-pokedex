@@ -97,3 +97,119 @@ export const fetchPokemonsData = async (
     })
   ).then((pokemons) => pokemons.filter((pokemon) => pokemon !== null));
 };
+
+export const starterPokemons = [
+  {
+    gen: 1,
+    name: "Kanto",
+    pokemons: [
+      { name: "bulbasaur", id: 1 },
+      { name: "charmander", id: 4 },
+      { name: "squirtle", id: 7 },
+    ],
+  },
+  {
+    gen: 2,
+    name: "Johto",
+    pokemons: [
+      { name: "chikorita", id: 152 },
+      { name: "cyndaquil", id: 155 },
+      { name: "totodile", id: 158 },
+    ],
+  },
+  {
+    gen: 3,
+    name: "Hoenn",
+    pokemons: [
+      { name: "treecko", id: 252 },
+      { name: "torchic", id: 255 },
+      { name: "mudkip", id: 258 },
+    ],
+  },
+  {
+    gen: 4,
+    name: "Sinnoh",
+    pokemons: [
+      { name: "turtwig", id: 387 },
+      { name: "chimchar", id: 390 },
+      { name: "piplup", id: 393 },
+    ],
+  },
+  {
+    gen: 5,
+    name: "Unova",
+    pokemons: [
+      { name: "snivy", id: 495 },
+      { name: "tepig", id: 498 },
+      { name: "oshawott", id: 501 },
+    ],
+  },
+  {
+    gen: 6,
+    name: "Kalos",
+    pokemons: [
+      { name: "chespin", id: 650 },
+      { name: "fennekin", id: 653 },
+      { name: "froakie", id: 656 },
+    ],
+  },
+  {
+    gen: 7,
+    name: "Alola",
+    pokemons: [
+      { name: "rowlet", id: 722 },
+      { name: "litten", id: 725 },
+      { name: "popplio", id: 728 },
+    ],
+  },
+  {
+    gen: 8,
+    name: "Galar",
+    pokemons: [
+      { name: "grookey", id: 810 },
+      { name: "scorbunny", id: 813 },
+      { name: "sobble", id: 816 },
+    ],
+  },
+  {
+    gen: 9,
+    name: "Paldea",
+    pokemons: [
+      { name: "sprigatito", id: 906 },
+      { name: "Fuecoco", id: 909 },
+      { name: "quaxly", id: 912 },
+    ],
+  },
+  {
+    gen: 0,
+    name: "Todas",
+    pokemons: [
+      { name: "umbreon", id: 197 },
+      { name: "leafeon", id: 470 },
+      { name: "glaceon", id: 471 },
+    ],
+  },
+];
+
+export const fetchStarterPokemonsImages = async () => {
+  const startersImage: { [key: number]: string[] } = {};
+
+  for (const gen of starterPokemons) {
+    const urls = await Promise.all(
+      gen.pokemons.map(async (pokemon) => {
+        try {
+          const response = await api.get(`/pokemon/${pokemon.id}`);
+          const details = response.data;
+          return details.sprites.front_default;
+        } catch (error) {
+          console.error(`Erro ao buscar imagem de ${pokemon.name}:`, error);
+          return null;
+        }
+      })
+    );
+
+    startersImage[gen.gen] = urls.filter((url) => url !== null);
+  }
+
+  return startersImage;
+};

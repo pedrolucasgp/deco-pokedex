@@ -45,7 +45,7 @@ export default function Pokedex() {
     await audioSelect.replayAsync();
   }
 
-  const handleFilter = (newLimit: number, newOffset: number) => {
+  const handleFilter = async (newLimit: number, newOffset: number) => {
     setLimit(newLimit);
     setOffset(newOffset);
   };
