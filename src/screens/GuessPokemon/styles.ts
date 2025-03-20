@@ -1,0 +1,108 @@
+import { StyleSheet } from "react-native";
+
+export const style = StyleSheet.create({
+  container: {
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 20,
+    width: "100%",
+    height: "100%",
+    backgroundColor: "#fffafa",
+    gap: 20,
+  },
+  title: {
+    fontSize: 25,
+    fontWeight: "bold",
+  },
+  description: {
+    fontSize: 20,
+    textAlign: "center",
+    lineHeight: 28,
+    padding: 10,
+    marginBottom: 120,
+  },
+  loadingWrapper: {
+    alignItems: "center",
+    justifyContent: "center",
+    position: "absolute",
+    gap: 30,
+  },
+  animation: {
+    width: 350,
+    height: 350,
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 2,
+  },
+  loadingText: {
+    fontSize: 20,
+    fontWeight: "bold",
+    flex: 1,
+  },
+  header: {
+    position: "absolute",
+    flexDirection: "row",
+    gap: "68%",
+    margin: "10%",
+    zIndex: 1,
+    alignItems: "center",
+  },
+  button: {
+    alignItems: "center",
+    justifyContent: "center",
+    width: "90%",
+    height: 50,
+    backgroundColor: "#ff474c",
+    borderRadius: 10,
+  },
+  buttonText: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "white",
+  },
+  imageWrapper: {
+    width: "auto",
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 10,
+    borderWidth: 0.5,
+    padding: 10,
+    marginTop: "20%",
+  },
+  image: {
+    width: 250,
+    height: 250,
+  },
+  inputWrapper: {
+    width: "100%",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 10,
+  },
+  inputText: {
+    width: "80%",
+    borderRadius: 10,
+    borderColor: "gray",
+    borderWidth: 1,
+    padding: 10,
+    gap: 5,
+  },
+  reloadButton: {
+    width: "10%",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 10,
+    borderWidth: 1,
+    padding: 5,
+    zIndex: 2,
+  },
+  pokemonName: {
+    fontSize: 24,
+    fontWeight: "bold",
+  },
+  wrongMessage: {
+    fontSize: 16,
+    color: "red",
+  },
+});

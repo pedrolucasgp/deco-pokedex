@@ -11,6 +11,7 @@ export default function CustomTabBar({ state, descriptors, navigation }) {
   const icons = {
     Pokedex: "format-list-bulleted",
     Favorites: "favorite",
+    GuessPokemon: "videogame-asset",
   };
 
   async function loadSound() {

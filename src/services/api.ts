@@ -213,3 +213,20 @@ export const fetchStarterPokemonsImages = async () => {
 
   return startersImage;
 };
+
+export const fetchRandomPokemon = async (randomNumber: number) => {
+  try {
+    const response = await api.get(`/pokemon/${randomNumber}`);
+    const guessPokemonData = {
+      ...response.data,
+      image:
+        response.data.sprites?.other?.["official-artwork"]?.front_default ||
+        response.data.sprites?.front_default,
+    };
+
+    return guessPokemonData;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};
