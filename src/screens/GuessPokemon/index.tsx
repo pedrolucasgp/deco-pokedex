@@ -13,18 +13,23 @@ export default function GuessPokemon() {
   const [randomNumber, setRandomNumber] = useState<number>(0);
 
   const [inputValue, setInputValue] = useState("");
-  const [userGuess, setUserGuess] = useState("");
   const [isCorrect, setIsCorrect] = useState(false);
 
   const [wrongMessage, setWrongMessage] = useState("");
 
-  const [audioSelect, setAudioSelect] = useState(null);
+  const [audioHit, setAudioHit] = useState(null);
+  const [audioPikachu, setAudioPikachu] = useState(null);
 
   async function loadSound() {
-    const { sound } = await Audio.Sound.createAsync(
+    const { sound: soundHitPokemon } = await Audio.Sound.createAsync(
       require("../../assets/caughtPokemon.mp3")
     );
-    setAudioSelect(sound);
+
+    const { sound: isPikachu } = await Audio.Sound.createAsync(
+      require("../../assets/itsPikachu.mp3")
+    );
+    setAudioHit(soundHitPokemon);
+    setAudioPikachu(isPikachu);
   }
 
   useEffect(() => {
@@ -48,12 +53,15 @@ export default function GuessPokemon() {
       if (guessPokemon?.name == inputValue.toLowerCase()) {
         setIsCorrect(true);
         setWrongMessage("");
-        await audioSelect.replayAsync();
+        if (guessPokemon?.name == "pikachu") {
+          await audioPikachu.replayAsync();
+        }
+        await audioHit.replayAsync();
       } else {
         setWrongMessage("Errado! Tente novamente");
       }
     } else {
-      alert("Por favor, insira um valor!");
+      alert("Por favor, insira um palpite!");
     }
   };
 
@@ -90,7 +98,7 @@ export default function GuessPokemon() {
       ) : (
         <>
           <View style={style.imageWrapper}>
-            {guessPokemon?.name == userGuess && (
+            {isCorrect && (
               <>
                 <Text style={style.pokemonName}>
                   {guessPokemon?.name.charAt(0).toUpperCase() +
